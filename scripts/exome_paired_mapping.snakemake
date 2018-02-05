@@ -1,6 +1,6 @@
 import os, sys, glob
 
-configfile: 'exome_config.yaml'
+configfile: 'config.yaml'
 #SAMPLES = [sra.strip() for sra in open("remaininglist.txt")]
 FILES = glob.glob('sra/*_1.fastq.gz')
 SAMPLES = [file.split('/')[1] for file in FILES]

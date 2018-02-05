@@ -1,6 +1,6 @@
 import os,sys
 
-configfile: 'varscan_dnacopy_config.yaml'
+configfile: 'config.yaml'
 SAMPLE=[]
 SAMPLE_SRR={}
 for line in open("unfinishedbam_matched_pair.tsv"):
