@@ -1,8 +1,6 @@
-#Snakemake script for downstream analysis from bam file
-#Author A.T
 import os,sys
 
-configfile: 'config.yaml'
+configfile: 'varscan_dnacopy_config.yaml'
 SAMPLE=[]
 SAMPLE_SRR={}
 for line in open("unfinishedbam_matched_pair.tsv"):
@@ -14,10 +12,10 @@ for line in open("unfinishedbam_matched_pair.tsv"):
 #print(SAMPLE)
 #print(SAMPLE_SRR)
 def return_normal(wildcards):
-        return(SAMPLE_SRR[wildcards.sample][1])
+        return("bams/"+SAMPLE_SRR[wildcards.sample][1]+".sorted.nodup.bam")
 
 def return_mets(wildcards):
-        return(SAMPLE_SRR[wildcards.sample][0])
+        return("bams/"+SAMPLE_SRR[wildcards.sample][0]+".sorted.nodup.bam")
 rule all:
         input:
                 expand("varscandata/{sample}.copynumber",sample=SAMPLE),
@@ -25,11 +23,6 @@ rule all:
                 expand("varscandata/{sample}.called",sample=SAMPLE),
                 expand("CNVsegments/{sample}_CNV.cb.tsv",sample=SAMPLE),
                 expand("plots/{sample}_CNV.pdf",sample=SAMPLE)
-                expand("exomeCNVoutput/{sample}.pdf",sample=SAMPLE),
-                expand("exomeCNVoutput/{sample}.cnv.txt",sample=SAMPLE),
-                expand("exomeCNVoutput/{sample}.exon.lrr.txt",sample=SAMPLE),
-                expand("exomeCNVoutput/{sample}.segment.copynumber.txt",
-                sample=SAMPLE)
 rule pileup_varscan:
         input:
                 mets = return_mets,
@@ -43,9 +36,8 @@ rule pileup_varscan:
         shell:
                 """
                 samtools mpileup -q 1 -B -f {config[ref_seq]} \
-                bams/{input.normal}.sorted.nodup.bam \
-                bams/{input.mets}.sorted.nodup.bam \
-                | java -jar {config[varscan_jar]} copynumber --mpileup \
+                {input.normal} {input.mets}| java -jar \
+                {config[varscan_jar]} copynumber --mpileup \
                 {params} 1
                 """
 rule adjustgc:
@@ -72,24 +64,4 @@ rule DNAcopy:
         shell:
                 """
                 Rscript getCNV.R {input} {wildcards.sample}
-                """
-rule plotexomeCNV:
-        input:
-                mets = return_mets,
-                normal = return_normal
-        output:
-                plot = "exomeCNVoutput/{sample}.pdf",
-                cnvfile = "exomeCNVoutput/{sample}.cnv.txt",
-                exonlrr ="exomeCNVoutput/{sample}.exon.lrr.txt",
-                segment = "exomeCNVoutput/{sample}.segment.copynumber.txt"
-        params:
-                "{sample}"
-        message:
-                "exomeCNV for {wildcards.sample}"
-        shell:
-                """
-                Rscript runexomeCNV.R \
-                        coverage/{input.mets}.sample_interval_summary \
-		 coverage/{input.normal}.sample_interval_summary \
-                {params}
                 """

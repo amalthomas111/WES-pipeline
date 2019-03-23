@@ -1,0 +1,9 @@
+__default__:
+    q : "cmb"
+    time : "300:00:00"
+    mem : "12000MB"
+    ppn : "1"
+
+bwa_mapping:
+    mem : "20000MB"
+    ppn : "8"

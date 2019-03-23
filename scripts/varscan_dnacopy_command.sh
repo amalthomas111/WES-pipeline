@@ -1,0 +1,1 @@
+snakemake -s varscan_dnacopy.snakemake --cluster-config varscan_dnacopy_cluster.yaml --jobs 30  --jobname 'exome.{rulename}.{wildcards.sample}.{jobid}.sh' --restart-times 20 --cluster "qsub -q {cluster.q} -l walltime={cluster.time} -l mem={cluster.mem} -l nodes=1:ppn={cluster.ppn}" 

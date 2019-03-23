@@ -1,0 +1,1 @@
+snakemake -s exome_paired.Snakemake --cluster-config exome_cluster.yaml --jobs 15  --jobname 'sj.{rulename}.{wildcards.sample}.{jobid}.sh' --restart-times 20 --cluster "qsub -q {cluster.q} -l walltime={cluster.time} -l mem={cluster.mem} -l nodes=1:ppn={cluster.ppn}" 
